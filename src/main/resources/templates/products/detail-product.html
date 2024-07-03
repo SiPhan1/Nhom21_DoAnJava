@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${product.name} ?: 'Product Info'">Product Info</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #72EDF2 10%, #5151E5 100%);
+            position: relative;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        .container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 50px;
+            width: 80%;
+            max-width: 1200px;
+        }
+        .product-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            gap: 30px;
+        }
+        .product-details {
+            flex: 1;
+            margin-bottom: 20px;
+        }
+        .product-details p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .product-details p span {
+            font-weight: bold;
+            color: #000;
+        }
+        .product-image {
+            width: 100px;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+            }
+        .btn-primary {
+            background: #000000
+            border: none;
+            border-radius: 10px;
+        }
+        .btn-primary:hover {
+            background: #000000;
+        }
+        .text-center {
+            margin-top: 30px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<header th:replace="layout :: header"></header>
+<section layout:fragment="content">
+    <div class="container">
+        <h1 class="text-center" th:text="${product.name}">Product Name</h1>
+        <div class="product-container">
+            <img th:src="${product.imageData}" alt="Product Image" class="product-image">
+            <div class="product-details">
+                <p><span>ID:</span> <span th:text="${product.id}">Product ID</span></p>
+                <p><span>Name:</span> <span th:text="${product.name}">Product Name</span></p>
+                <p><span>Price:</span> <span th:text="${product.price}">Product Price</span></p>
+                <p><span>Description:</span> <span th:text="${product.description}">Product Description</span></p>
+                <p><span>Category:</span> <span th:text="${product.category.name}">Category Name</span></p>
+            </div>
+        </div>
+        <div class="text-center">
+            <a th:href="@{/products}" class="btn btn-primary">Back to Products</a>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<footer th:replace="layout :: footer"></footer>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${title} ?: 'Product'">Product</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #72EDF2 10%, #5151E5 100%);
+            position: relative;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .table thead {
+            background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+            color: #ffffff;
+        }
+        .table img {
+            width: 100px;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .btn {
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #07ff6c;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+<header th:replace="layout :: header"></header>
+<section layout:fragment="content">
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Products List</h1>
+        <div class="text-center mb-3">
+            <a sec:authorize="hasAnyAuthority('ADMIN')" th:href="@{/products/add}" class="btn btn-primary">Add New Product</a>
+        </div>
+
+        <!-- Search form -->
+        <form id="searchForm" class="mb-4">
+            <div class="row">
+                <div class="col-md-5">
+                    <input type="text" id="searchName" class="form-control" placeholder="Search by Name" />
+                </div>
+                <div class="col-md-5">
+                    <input type="text" id="searchId" class="form-control" placeholder="Search by ID" />
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary w-100" onclick="filterTable()">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table id="productTable" class="table table-bordered table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Category Name</th>
+                    <th>Image</th>
+                    <th sec:authorize="hasAnyAuthority('ADMIN')">Actions</th>
+                    <th sec:authorize="hasAnyAuthority('USER', 'ADMIN')">Detail</th>
+                    <th sec:authorize="hasAnyAuthority('USER')">Add To Cart</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product : ${products}">
+                    <td th:text="${product.id}"></td>
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.price}"></td>
+                    <td th:text="${product.description}"></td>
+                    <td th:text="${product.category != null ? product.category.name : 'No Category'}"></td>
+                    <td><img th:src="${product.imageData}" alt="Product Image"></td>
+                    <td sec:authorize="hasAnyAuthority('ADMIN')">
+                        <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-success btn-sm">Edit</a>
+                        <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                    <td sec:authorize="hasAnyAuthority('USER', 'ADMIN')">
+                        <a th:href="@{/products/detail/{id}(id=${product.id})}" class="btn btn-info btn-sm">Detail</a>
+                    </td>
+                    <td sec:authorize="hasAnyAuthority('USER')">
+                        <form th:action="@{/cart/add}" method="post">
+                            <input type="number" name="quantity" min="1" value="1" class="form-control d-inline-block" style="width: 70px;">
+                            <input type="hidden" th:value="${product.id}" name="productId"/>
+                            <button type="submit" class="btn btn-warning btn-sm">Add to Cart</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+
+    function filterTable() {
+        const searchName = document.getElementById("searchName").value.toLowerCase();
+        const searchId = document.getElementById("searchId").value.toLowerCase();
+        const table = document.getElementById("productTable");
+        const rows = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < rows.length; i++) {
+            const idCell = rows[i].getElementsByTagName("td")[0];
+            const nameCell = rows[i].getElementsByTagName("td")[1];
+            const id = idCell.textContent || idCell.innerText;
+            const name = nameCell.textContent || nameCell.innerText;
+
+            if ((searchName && name.toLowerCase().includes(searchName)) || (searchId && id.toLowerCase().includes(searchId))) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>
+<footer th:replace="layout :: footer"></footer>
+</body>
+</html>
